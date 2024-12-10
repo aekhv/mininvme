@@ -4,7 +4,7 @@
 The MiniNVMe kernel module is designed for data recovery from partially faulty NVMe devices. This module has minimal functionality and replaces the standard NVMe driver. This also means your system shall to boot from the non-NVMe storage (SATA, Live-USB, etc).
 
 ## Preparation
-Before using this module you must block the loading of the standard NVMe driver. Open `/etc/default/grub` in any plain text editor and append (or edit) the line below:
+Before using this module you have to block the loading of the standard NVMe driver. Open `/etc/default/grub` in any plain text editor and append (or edit) the line below:
 ```
 GRUB_CMDLINE_LINUX_DEFAULT="quiet splash modprobe.blacklist=nvme"
 ```
