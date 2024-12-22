@@ -2,7 +2,7 @@
 **
 ** This file is part of the MiniNVMe project.
 ** Copyright (C) 2024 Alexander E. <aekhv@vk.com>
-** License: GNU LGPL v2, see file LICENSE.
+** License: GNU GPL v2, see file LICENSE.
 **
 ****************************************************************************/
 
@@ -214,6 +214,7 @@ FAIL:
 
     return 0;
 }
+
 long device_ioctl(struct file *pFile, unsigned int cmd, unsigned long arg)
 {
     nvme_driver_data_t *pDrvData = pFile->private_data;

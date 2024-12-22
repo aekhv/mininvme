@@ -2,7 +2,7 @@
 **
 ** This file is part of the MiniNVMe project.
 ** Copyright (C) 2024 Alexander E. <aekhv@vk.com>
-** License: GNU LGPL v2, see file LICENSE.
+** License: GNU GPL v2, see file LICENSE.
 **
 ****************************************************************************/
 

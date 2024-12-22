@@ -2,7 +2,7 @@
 **
 ** This file is part of the MiniNVMe project.
 ** Copyright (C) 2024 Alexander E. <aekhv@vk.com>
-** License: GNU LGPL v2, see file LICENSE.
+** License: GNU GPL v2, see file LICENSE.
 **
 ****************************************************************************/
 
@@ -17,7 +17,7 @@
 #include "nvme.h"
 #include "ioctl.h"
 
-MODULE_LICENSE("GPL");
+MODULE_LICENSE("GPL v2");
 MODULE_AUTHOR("Alexander E. <aekhv@vk.com>");
 MODULE_DESCRIPTION("MiniNVMe kernel module");
 MODULE_VERSION("1.0");

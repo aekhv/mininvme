@@ -2,7 +2,7 @@
 **
 ** This file is part of the MiniNVMe project.
 ** Copyright (C) 2024 Alexander E. <aekhv@vk.com>
-** License: GNU LGPL v2, see file LICENSE.
+** License: GNU GPL v2, see file LICENSE.
 **
 ****************************************************************************/
 
@@ -18,16 +18,16 @@ static void nvme_allocate_buffers(nvme_driver_data_t *pDrvData)
 
     for (i = 0; i < 2; i++) {
         pDrvData->cmdQueue[i].pCompEntries = dma_alloc_coherent(&(pDrvData->pPciDev->dev),
-                                                 NVME_QUEUE_ENTRY_COUNT * sizeof(NVME_COMPLETION_QUEUE_ENTRY),
-                                                 &(pDrvData->cmdQueue[i].pCompEntriesDma), GFP_KERNEL);
+                                                                NVME_QUEUE_ENTRY_COUNT * sizeof(NVME_COMPLETION_QUEUE_ENTRY),
+                                                                &(pDrvData->cmdQueue[i].pCompEntriesDma), GFP_KERNEL);
         memset(pDrvData->cmdQueue[i].pCompEntries, 0, NVME_QUEUE_ENTRY_COUNT * sizeof(NVME_COMPLETION_QUEUE_ENTRY));
         if (pDrvData->debug)
             printk(KERN_INFO "%s: cmdQueue[%d].pCompEntries: allocated at 0x%016llx\n",
                    KBUILD_MODNAME, i, (uint64_t)pDrvData->cmdQueue[i].pCompEntriesDma);
 
         pDrvData->cmdQueue[i].pSubmEntries = dma_alloc_coherent(&(pDrvData->pPciDev->dev),
-                                                 NVME_QUEUE_ENTRY_COUNT * sizeof(NVME_SUBMISSION_QUEUE_ENTRY),
-                                                 &(pDrvData->cmdQueue[i].pSubmEntriesDma), GFP_KERNEL);
+                                                                NVME_QUEUE_ENTRY_COUNT * sizeof(NVME_SUBMISSION_QUEUE_ENTRY),
+                                                                &(pDrvData->cmdQueue[i].pSubmEntriesDma), GFP_KERNEL);
         memset(pDrvData->cmdQueue[i].pSubmEntries, 0, NVME_QUEUE_ENTRY_COUNT * sizeof(NVME_SUBMISSION_QUEUE_ENTRY));
         if (pDrvData->debug)
             printk(KERN_INFO "%s: cmdQueue[%d].pSubmEntries: allocated at 0x%016llx\n",
@@ -80,7 +80,7 @@ static irqreturn_t irq_handler(int irq, void *data)
 
     pDrvData->intCounter++;
 
-//    if (debug)
+//    if (pDrvData->debug)
 //        printk(KERN_INFO "%s: INTERRUPT! (irq=%d, counter=%d)\n", KBUILD_MODNAME, irq, pDrvData->intCounter);
 
     return IRQ_HANDLED;
