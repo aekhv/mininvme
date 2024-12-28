@@ -1,7 +1,7 @@
 # MiniNVMe kernel module for Linux
 
 ## Description
-The MiniNVMe kernel module is designed for data recovery from partially faulty NVMe devices. This module has minimal functionality and hides the connected devices from the operating system. As result attached device will be OS isolated and the only way to get full control over that device is a user application library. See QMiniNVMeDevice library sources for more details.
+The MiniNVMe kernel module is designed for data recovery from partially faulty NVMe devices. This module has minimal functionality and hides the connected devices from the operating system. As result attached device will be OS isolated and the only way to get full control over that device is a user application library. For more information see the source code of the QMiniNVMeDevice library.
 
 ## Preparation
 Before using this module you have to block the loading of the standard NVMe driver. Open `/etc/default/grub` in any plain text editor and append (or edit) the line below:
