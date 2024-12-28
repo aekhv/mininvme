@@ -14,6 +14,7 @@ SOURCES += \
 HEADERS += \
     driver.h \
     ioctl.h \
+    minipci.h \
     nvme.h
 
 OTHER_FILES += \

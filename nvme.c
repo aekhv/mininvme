@@ -351,6 +351,10 @@ void nvme_execute_command(nvme_driver_data_t *pDrvData, nvme_command_packet_t *p
         cpu_relax();
     }
 
+    // What will we do in this case?...
+    if (pCmdQueue->cid != pCmdQueue->pCompEntries[pCmdQueue->cqhidx].cid)
+        printk(KERN_ERR "%s: Critical error! Wrong CID received!\n", KBUILD_MODNAME);
+
     pCmdPacket->status.sct = pCmdQueue->pCompEntries[pCmdQueue->cqhidx].sct;
     pCmdPacket->status.sc = pCmdQueue->pCompEntries[pCmdQueue->cqhidx].sc;
     pCmdPacket->status.more = pCmdQueue->pCompEntries[pCmdQueue->cqhidx].m;

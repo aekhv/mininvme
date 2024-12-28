@@ -27,9 +27,9 @@ int device_release(struct inode *pInode, struct file *pFile)
     return 0;
 }
 
-static int ioctl_get_driver_version(nvme_driver_version_t *pVersion)
+static int ioctl_get_driver_version(minipci_driver_version_t *pVersion)
 {
-    nvme_driver_version_t version;
+    minipci_driver_version_t version;
 
     if (!pVersion)
         return -EINVAL;
@@ -44,12 +44,12 @@ static int ioctl_get_driver_version(nvme_driver_version_t *pVersion)
     return 0;
 }
 
-static int ioctl_get_pci_device_info(nvme_driver_data_t *pDrvData, nvme_pci_device_info_t *pDevInfo)
+static int ioctl_get_pci_device_info(nvme_driver_data_t *pDrvData, minipci_device_info_t *pDevInfo)
 {
     struct pci_dev *pPciDev = pDrvData->pPciDev;
     struct pci_bus *pBus = pPciDev->bus;
     struct pci_host_bridge *host = pci_find_host_bridge(pBus);
-    nvme_pci_device_info_t info;
+    minipci_device_info_t info;
     uint16_t linkStatus = 0;
 
     if (!pDevInfo)
@@ -117,6 +117,9 @@ static int ioctl_run_command(nvme_driver_data_t *pDrvData, nvme_command_packet_t
     if (copy_from_user(&cmdPacket, pCmdPacket, sizeof (cmdPacket)))
         return -EFAULT;
 
+    if (cmdPacket.buffer.length > NVME_BUFFER_SIZE_MAX)
+        return -EINVAL;
+
     nvme_execute_command(pDrvData, &cmdPacket, cmdQueueId);
 
     if (copy_to_user(pCmdPacket, &cmdPacket, sizeof (cmdPacket)))
@@ -130,6 +133,9 @@ static int ioctl_read_sectors(nvme_driver_data_t *pDrvData, nvme_lba_packet_t *p
     nvme_lba_packet_t lbaPacket;
     if (copy_from_user(&lbaPacket, pLbaPacket, sizeof (lbaPacket)))
         return -EFAULT;
+
+    if (lbaPacket.buffer.length > NVME_BUFFER_SIZE_MAX)
+        return -EINVAL;
 
     if (!pDrvData->ioCompQuRdy) {
         nvme_create_io_completion_queue(pDrvData, &lbaPacket.status);
@@ -176,6 +182,9 @@ static int ioctl_write_sectors(nvme_driver_data_t *pDrvData, nvme_lba_packet_t *
     if (copy_from_user(&lbaPacket, pLbaPacket, sizeof (lbaPacket)))
         return -EFAULT;
 
+    if (lbaPacket.buffer.length > NVME_BUFFER_SIZE_MAX)
+        return -EINVAL;
+
     if (!pDrvData->ioCompQuRdy) {
         nvme_create_io_completion_queue(pDrvData, &lbaPacket.status);
         if (lbaPacket.status.timeout )
@@ -219,15 +228,15 @@ long device_ioctl(struct file *pFile, unsigned int cmd, unsigned long arg)
 {
     nvme_driver_data_t *pDrvData = pFile->private_data;
 
-    if (_IOC_TYPE(cmd) != NVME_IOCTL_BASE)
+    if (_IOC_TYPE(cmd) != MINIPCI_IOCTL_BASE)
         return -EINVAL;
 
     switch (cmd) {
-    case NVME_IOCTL_GET_DRIVER_VERSION:
-        return ioctl_get_driver_version((nvme_driver_version_t *)arg);
+    case MINIPCI_IOCTL_GET_DRIVER_VERSION:
+        return ioctl_get_driver_version((minipci_driver_version_t *)arg);
 
-    case NVME_IOCTL_GET_PCI_DEVICE_INFO:
-        return ioctl_get_pci_device_info(pDrvData, (nvme_pci_device_info_t *)arg);
+    case MINIPCI_IOCTL_GET_DEVICE_INFO:
+        return ioctl_get_pci_device_info(pDrvData, (minipci_device_info_t *)arg);
 
     case NVME_IOCTL_GET_CONTROLLER_VERSION:
         return ioctl_get_controller_version(pDrvData, (nvme_controller_version_t *)arg);
