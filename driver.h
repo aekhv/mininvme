@@ -59,10 +59,11 @@ typedef struct {
 
     volatile uint32_t intCounter;       // Interrupt counter
 
-    struct page *pUserPages[NVME_BUFFER_SIZE_MAX / PAGE_SIZE + 1];
-    dma_addr_t *pSgList;
-    dma_addr_t pSgListDma;
-    uint32_t sgListLength;
+    uint32_t userPagesCount;
+    struct page *pUserPages[NVME_BUFFER_SIZE_MAX / PAGE_SIZE + 1]; // User buffer mapped pages
+
+    dma_addr_t *pSgList; // Scatter Gather List (list of physical memory pages) - virtual address
+    dma_addr_t pSgListDma; // Physical address
 
     bool ioCompQuRdy; // IO completion queue ready flag
     bool ioSubmQuRdy; // IO submission queue ready flag

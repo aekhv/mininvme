@@ -112,34 +112,34 @@ static void nvme_unregister_interrupt(nvme_driver_data_t *pDrvData)
     pci_free_irq_vectors(pDrvData->pPciDev);
 }
 
-static void nvme_map_user_pages(nvme_driver_data_t *pDrvData, nvme_buffer_t *pNvmeBuffer)
+static void nvme_map_user_pages(nvme_driver_data_t *pDrvData, nvme_buffer_t *pBuffer)
 {
     uint32_t i, n;
     uint32_t offs, len;
 
-    const uint64_t first_page = (uint64_t)pNvmeBuffer->pointer >> PAGE_SHIFT;
-    const uint64_t last_page = ((uint64_t)pNvmeBuffer->pointer + pNvmeBuffer->length - 1) >> PAGE_SHIFT;
+    const uint64_t first_page = (uint64_t)pBuffer->pointer >> PAGE_SHIFT;
+    const uint64_t last_page = ((uint64_t)pBuffer->pointer + pBuffer->length - 1) >> PAGE_SHIFT;
 
-    pDrvData->sgListLength = get_user_pages((uint64_t)pNvmeBuffer->pointer & PAGE_MASK,
+    pDrvData->userPagesCount = get_user_pages((uint64_t)pBuffer->pointer & PAGE_MASK,
                                             last_page - first_page + 1,
                                             FOLL_FORCE,
                                             pDrvData->pUserPages);
 
     n = 0;
-    for (i = 0; i < pDrvData->sgListLength; i++) {
+    for (i = 0; i < pDrvData->userPagesCount; i++) {
 
         offs = 0;
         len = PAGE_SIZE;
 
         if (i == 0) {
-            offs = (uint64_t)pNvmeBuffer->pointer & (PAGE_SIZE - 1);
+            offs = (uint64_t)pBuffer->pointer & (PAGE_SIZE - 1);
             len -= offs;
-            if (len > pNvmeBuffer->length)
-                len = pNvmeBuffer->length;
+            if (len > pBuffer->length)
+                len = pBuffer->length;
         }
         else
-            if (i == pDrvData->sgListLength - 1)
-                len = pNvmeBuffer->length - n;
+            if (i == pDrvData->userPagesCount - 1)
+                len = pBuffer->length - n;
 
         pDrvData->pSgList[i] = dma_map_page(&(pDrvData->pPciDev->dev),
                                                   pDrvData->pUserPages[i],
@@ -154,23 +154,23 @@ static void nvme_map_user_pages(nvme_driver_data_t *pDrvData, nvme_buffer_t *pNv
     }
 }
 
-static void nvme_unmap_user_pages(nvme_driver_data_t *pDrvData, nvme_buffer_t *pNvmeBuffer)
+static void nvme_unmap_user_pages(nvme_driver_data_t *pDrvData, nvme_buffer_t *pBuffer)
 {
     uint32_t i, n, len;
 
     n = 0;
-    for (i = 0; i < pDrvData->sgListLength; i++) {
+    for (i = 0; i < pDrvData->userPagesCount; i++) {
 
         len = PAGE_SIZE;
 
         if (i == 0) {
             len -= pDrvData->pSgList[i] & (PAGE_SIZE - 1);
-            if (len > pNvmeBuffer->length)
-                len = pNvmeBuffer->length;
+            if (len > pBuffer->length)
+                len = pBuffer->length;
         }
         else
-            if (i == pDrvData->sgListLength - 1)
-                len = pNvmeBuffer->length - n;
+            if (i == pDrvData->userPagesCount - 1)
+                len = pBuffer->length - n;
 
         dma_unmap_page(&(pDrvData->pPciDev->dev),
                        pDrvData->pSgList[i],
@@ -184,7 +184,7 @@ static void nvme_unmap_user_pages(nvme_driver_data_t *pDrvData, nvme_buffer_t *p
 
     }
 
-    pDrvData->sgListLength = 0;
+    pDrvData->userPagesCount = 0;
 }
 
 int nvme_controller_enable(nvme_driver_data_t *pDrvData)
@@ -314,7 +314,7 @@ void nvme_execute_command(nvme_driver_data_t *pDrvData, nvme_command_packet_t *p
 
     if (pCmdPacket->buffer.length != 0) {
         nvme_map_user_pages(pDrvData, &(pCmdPacket->buffer));
-        switch (pDrvData->sgListLength) {
+        switch (pDrvData->userPagesCount) {
         case 1:
             pEntry->prp[0] = pDrvData->pSgList[0];
             break;
