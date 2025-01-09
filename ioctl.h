@@ -67,6 +67,10 @@ typedef struct {
     nvme_status_t status;
 } nvme_lba_packet_t;
 
+typedef struct {
+    uint32_t value;     // Timeout in milliseconds
+} nvme_timeout_t;
+
 enum _NVME_IOCTL {
     _NVME_IOCTL_GET_CONTROLLER_VERSION = 0x20,
     _NVME_IOCTL_GET_CONTROLLER_STATE,
@@ -74,7 +78,9 @@ enum _NVME_IOCTL {
     _NVME_IOCTL_RUN_IO_COMMAND,
     _NVME_IOCTL_READ_SECTORS,
     _NVME_IOCTL_WRITE_SECTORS,
-    _NVME_IOCTL_CONTROLLER_RESET
+    _NVME_IOCTL_CONTROLLER_RESET,
+    _NVME_IOCTL_SET_TIMOUT,
+    _NVME_IOCTL_GET_TIMOUT
 };
 
 #define NVME_IOCTL_GET_CONTROLLER_VERSION   _IOR(MINIPCI_IOCTL_BASE, _NVME_IOCTL_GET_CONTROLLER_VERSION, nvme_controller_version_t)
@@ -84,5 +90,7 @@ enum _NVME_IOCTL {
 #define NVME_IOCTL_READ_SECTORS             _IOWR(MINIPCI_IOCTL_BASE, _NVME_IOCTL_READ_SECTORS, nvme_lba_packet_t)
 #define NVME_IOCTL_WRITE_SECTORS            _IOWR(MINIPCI_IOCTL_BASE, _NVME_IOCTL_WRITE_SECTORS, nvme_lba_packet_t)
 #define NVME_IOCTL_CONTROLLER_RESET         _IO(MINIPCI_IOCTL_BASE, _NVME_IOCTL_CONTROLLER_RESET)
+#define NVME_IOCTL_SET_TIMOUT               _IOW(MINIPCI_IOCTL_BASE, _NVME_IOCTL_SET_TIMOUT, nvme_timeout_t)
+#define NVME_IOCTL_GET_TIMOUT               _IOR(MINIPCI_IOCTL_BASE, _NVME_IOCTL_GET_TIMOUT, nvme_timeout_t)
 
 #endif // IOCTL_H

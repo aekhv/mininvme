@@ -194,7 +194,7 @@ int nvme_controller_enable(nvme_driver_data_t *pDrvData)
     NVME_MEMORY *pNvmeMem = pDrvData->pNvmeMem;
 
     // Disable NVMe controller if it's already enabled by BIOS/OS
-    future = jiffies + msecs_to_jiffies(3000);
+    future = jiffies + msecs_to_jiffies(NVME_DEFAULT_TIMEOUT);
     pNvmeMem->cc.en = 0;
     while (true) {
         if (!pNvmeMem->csts.rdy)
@@ -248,8 +248,10 @@ int nvme_controller_enable(nvme_driver_data_t *pDrvData)
     pDrvData->ioCompQuRdy = false;
     pDrvData->ioSubmQuRdy = false;
 
+    pDrvData->timeout = NVME_DEFAULT_TIMEOUT;
+
     // Enable NVMe controller
-    future = jiffies + msecs_to_jiffies(3000);
+    future = jiffies + msecs_to_jiffies(NVME_DEFAULT_TIMEOUT);
     pNvmeMem->cc.en = 1;
     while (true) {
         if (pNvmeMem->csts.rdy)
@@ -270,7 +272,7 @@ void nvme_controller_disable(nvme_driver_data_t *pDrvData)
     NVME_MEMORY *pNvmeMem = pDrvData->pNvmeMem;
 
     // Disable NVMe controller
-    future = jiffies + msecs_to_jiffies(3000);
+    future = jiffies + msecs_to_jiffies(NVME_DEFAULT_TIMEOUT);
     pNvmeMem->cc.en = 0;
     while (true) {
         if (!pNvmeMem->csts.rdy)

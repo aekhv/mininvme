@@ -224,6 +224,29 @@ FAIL:
     return 0;
 }
 
+static int nvme_set_timeout(nvme_driver_data_t *pDrvData, nvme_timeout_t *pTimeout)
+{
+    nvme_timeout_t timeout;
+
+    if (copy_from_user(&timeout, pTimeout, sizeof (timeout)))
+        return -EFAULT;
+
+    pDrvData->timeout = timeout.value;
+
+    return 0;
+}
+
+static int nvme_get_timeout(nvme_driver_data_t *pDrvData, nvme_timeout_t *pTimeout)
+{
+    nvme_timeout_t timeout;
+    timeout.value = pDrvData->timeout;
+
+    if (copy_to_user(pTimeout, &timeout, sizeof (timeout)))
+        return -EFAULT;
+
+    return 0;
+}
+
 long device_ioctl(struct file *pFile, unsigned int cmd, unsigned long arg)
 {
     nvme_driver_data_t *pDrvData = pFile->private_data;
@@ -261,6 +284,12 @@ long device_ioctl(struct file *pFile, unsigned int cmd, unsigned long arg)
         mdelay(500);
         nvme_controller_enable(pDrvData);
         break;
+
+    case NVME_IOCTL_SET_TIMOUT:
+        return nvme_set_timeout(pDrvData, (nvme_timeout_t *)arg);
+
+    case NVME_IOCTL_GET_TIMOUT:
+        return nvme_get_timeout(pDrvData, (nvme_timeout_t *)arg);
 
     default:
         return -EINVAL;

@@ -38,6 +38,9 @@ module_param(debug, bool, 0);
 #define NVME_QUEUE_ENTRY_COUNT      2
 #define NVME_BUFFER_SIZE_MAX        1048576
 
+// Default timeout in milliseconds
+#define NVME_DEFAULT_TIMEOUT        5000
+
 typedef struct {
     NVME_COMPLETION_QUEUE_ENTRY *pCompEntries; // Virtual addresses
     NVME_SUBMISSION_QUEUE_ENTRY *pSubmEntries;
@@ -67,6 +70,8 @@ typedef struct {
 
     bool ioCompQuRdy; // IO completion queue ready flag
     bool ioSubmQuRdy; // IO submission queue ready flag
+
+    uint32_t timeout;
 
     bool debug;
 } nvme_driver_data_t;
